@@ -1,16 +1,33 @@
+// {
+//   "name": "bagplotserver",
+//   "version": "1.0.0",
+//   "description": "Server for BagPlot Project",
+//   "main": "server.js",
+//   "scripts": {
+//     "start": "node server.js",
+//     "test": "echo \"Error: no test specified\" && exit 1"
+//   },
+//   "author": "",
+//   "license": "ISC",
+//   "dependencies": {
+//     "express": "^4.16.1",
+//     "mysql": "^2.15.0"
+//   }
+// }
+
+
 {
   "name": "bagplotserver",
   "version": "1.0.0",
   "description": "Server for BagPlot Project",
-  "main": "server.js",
+  "license": "MIT",
   "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "express": "^4.16.1",
     "mysql": "^2.15.0"
-  }
+  },
+  "private": true,
 }
