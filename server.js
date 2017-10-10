@@ -17,6 +17,8 @@ var customersFactory = require('./Factories/customersFactory');
 var projectsFactory = require('./Factories/projectsFactory');
 var contactFactory = require('./Factories/contactFactory');
 
+var port=Number(process.env.PORT || 3000);
+
 app.get('/getAllCustomers', function(req, res) {
     customersFactory.getAllCustomers(function(customerList) {
         res.send(customerList);
@@ -57,4 +59,4 @@ app.post('/createContact', function(req, res) {
     });
 })
 
-app.listen(3000);
+app.listen(port);
