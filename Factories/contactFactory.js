@@ -3,7 +3,8 @@ var contactModel = require('../models/contact');
 
 function createContact(contactReq, callback) {
     var date_created = new Date();
-    dbConnection.connectDB(`INSERT INTO BagPlot.Contact 
+    // dbConnection.connectDB(`INSERT INTO BagPlot.Contact 
+    dbConnection.connectDB(`INSERT INTO Contact 
     (firstName, lastName, phoneOffice, faxNumber, cellular, email, date_created, project_id) 
     values (?, ?, ?, ?, ?, ?, ?, ?)`,
     [contactReq.firstName, contactReq.lastName, contactReq.phoneOffice, contactReq.faxNumber, contactReq.cellular, contactReq.email, date_created, contactReq.project_id],

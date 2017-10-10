@@ -3,7 +3,8 @@ var customerModel = require('../models/customer');
 
 
 function getAllCustomers(callback) {
-    dbConnection.connectDB('SELECT * FROM BagPlot.Customer;', 
+    // dbConnection.connectDB('SELECT * FROM BagPlot.Customer;', 
+    dbConnection.connectDB('SELECT * FROM Customer;',
         null, 
         function(error, rows, fields) {
             if(!!error) {
@@ -24,7 +25,8 @@ function getAllCustomers(callback) {
 }
 
 function getCustomersByName(name, callback) {
-    dbConnection.connectDB('SELECT * FROM BagPlot.Customer where customer_name like ?',
+    // dbConnection.connectDB('SELECT * FROM BagPlot.Customer where customer_name like ?',
+    dbConnection.connectDB('SELECT * FROM Customer where customer_name like ?',
         ['%' + name + '%'],
         function(error, rows, fields) {
             if(!!error) {
@@ -45,7 +47,8 @@ function getCustomersByName(name, callback) {
 }
 
 function createCustomer(name, callback) {
-    dbConnection.connectDB('INSERT INTO BagPlot.Customer (customer_name) values (?)',
+    // dbConnection.connectDB('INSERT INTO BagPlot.Customer (customer_name) values (?)',
+    dbConnection.connectDB('INSERT INTO Customer (customer_name) values (?)',
     [name],
     function(error, rows, fields) {
         var customer = new customerModel();

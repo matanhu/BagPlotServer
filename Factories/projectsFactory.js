@@ -3,7 +3,8 @@ var projectModel = require('../models/project');
 
 
 function getAllProjects(callback) {
-    dbConnection.connectDB('SELECT * FROM BagPlot.Project;', 
+    // dbConnection.connectDB('SELECT * FROM BagPlot.Project;', 
+    dbConnection.connectDB('SELECT * FROM Project;', 
         null, 
         function(error, rows, fields) {
             if(!!error) {
@@ -26,7 +27,8 @@ function getAllProjects(callback) {
 
 function createProject(projectReq, callback) {
     var date_created = new Date();
-    dbConnection.connectDB('INSERT INTO BagPlot.Project (customer_id, project_name, description, date_created) values (?, ?, ?, ?)',
+    // dbConnection.connectDB('INSERT INTO BagPlot.Project (customer_id, project_name, description, date_created) values (?, ?, ?, ?)',
+    dbConnection.connectDB('INSERT INTO Project (customer_id, project_name, description, date_created) values (?, ?, ?, ?)',
     [projectReq.customer_id, projectReq.project_name, projectReq.description, date_created],
     function(error, rows, fields) {
         var project = new projectModel();
