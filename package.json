@@ -1,17 +1,15 @@
-
-
 {
   "name": "bagplotserver",
   "version": "1.0.0",
   "description": "Server for BagPlot Project",
-  "license": "MIT",
+  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
+  "license": "ISC",
   "dependencies": {
     "express": "^4.16.1",
     "mysql": "^2.15.0"
-  },
-  "private": true
+  }
 }
