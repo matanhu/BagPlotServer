@@ -54,5 +54,34 @@ function createProject(projectReq, callback) {
     });
 }
 
+function updateProject(projectReq, callback) {
+    dbConnection.connectDB('UPDATE Project SET project_name = ?, description = ?, image = ? WHERE id = ?',
+    [projectReq.project_name, projectReq.description, projectReq.image, projectReq.id],
+    function(error, rows, fields) {
+        var project = new projectModel();
+        if(!!error) {
+            console.error("createProject: " + error);
+            project.isSuccess = false;
+            project.errorMessage = error.code;
+            callback(project);
+        } else {
+            if(rows && rows.insertId) {
+                project.id = rows.insertId;
+                project.project_name = projectReq.project_name;
+                project.description = projectReq.description;
+                project.image = projectReq.image;
+                project.isSuccess = true;
+                callback(project);
+            } else {
+                console.error("createProject: Cannot insert new project");
+                project.isSuccess = false;
+                project.errorMessage = 'Cannot insert new project';
+                callback(project);
+            }
+        }
+    });
+}
+
 module.exports.getAllProjects = getAllProjects;
 module.exports.createProject = createProject;
+module.exports.updateProject = updateProject;

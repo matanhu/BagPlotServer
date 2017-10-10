@@ -52,6 +52,13 @@ app.post('/createProject', function(req,res) {
     });
 });
 
+app.put('/updateProject', function(req,res) {
+    var project = req.body;
+    projectsFactory.createProject(project, function(project) {
+        res.send(project);
+    });
+});
+
 app.post('/createContact', function(req, res) {
     var contact = req.body;
     contactFactory.createContact(contact, function(contact) {
