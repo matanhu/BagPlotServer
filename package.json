@@ -13,5 +13,5 @@
     "express": "^4.16.1",
     "mysql": "^2.15.0"
   },
-  "private": true,
+  "private": true
 }
