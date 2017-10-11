@@ -38,4 +38,26 @@ function createContact(contactReq, callback) {
     });
 }
 
+function getContacsByProjectId(projectId, callback) {
+    dbConnection.connectDB('SELECT * FROM Contact where project_id = ?',
+    [projectId],
+    function(error, rows, fields) {
+        if(!!error) {
+            var customer = new customerModel();
+            customer.isSuccess = false;
+            customer.errorMessage = error.code;
+            console.error("getContacsByProjectId: " + error);
+            callback(customer);
+        } else {
+            var res = {
+                isSuccess: true,
+                customers: rows
+            }
+            callback(rows);
+        }
+    }
+);
+}
+
 module.exports.createContact = createContact;
+module.exports.getContacsByProjectId = getContacsByProjectId;

@@ -17,6 +17,7 @@ app.use(function(req, res, next) {
 var customersFactory = require('./Factories/customersFactory');
 var projectsFactory = require('./Factories/projectsFactory');
 var contactFactory = require('./Factories/contactFactory');
+var documentFactory = require('./Factories/documentFactory');
 
 var port=Number(process.env.PORT || 3000);
 
@@ -65,6 +66,13 @@ app.post('/createContact', function(req, res) {
     contactFactory.createContact(contact, function(contact) {
         res.send(contact);
     });
-})
+});
+
+app.post('/createDocx', function(req, res) {
+    var project = req.body;
+    documentFactory.createDocx(project, function(docFile) {
+        console.log(docFile);
+    });
+});
 
 app.listen(port);

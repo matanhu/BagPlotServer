@@ -46,6 +46,28 @@ function getCustomersByName(name, callback) {
     );
 }
 
+function getCustomersById(id, callback) {
+    // dbConnection.connectDB('SELECT * FROM BagPlot.Customer where customer_name like ?',
+    dbConnection.connectDB('SELECT * FROM Customer where id = ?',
+        [id],
+        function(error, rows, fields) {
+            if(!!error) {
+                var customer = new customerModel();
+                customer.isSuccess = false;
+                customer.errorMessage = error.code;
+                console.error("getCustomersByName: " + error);
+                callback(customer);
+            } else {
+                var res = {
+                    isSuccess: true,
+                    customers: rows
+                }
+                callback(res);
+            }
+        }
+    );
+}
+
 function createCustomer(name, callback) {
     // dbConnection.connectDB('INSERT INTO BagPlot.Customer (customer_name) values (?)',
     dbConnection.connectDB('INSERT INTO Customer (customer_name) values (?)',
@@ -76,3 +98,4 @@ function createCustomer(name, callback) {
 module.exports.getAllCustomers = getAllCustomers;
 module.exports.getCustomersByName = getCustomersByName;
 module.exports.createCustomer = createCustomer;
+module.exports.getCustomersById = getCustomersById;

@@ -82,6 +82,32 @@ function updateProject(projectReq, callback) {
     });
 }
 
+function getProjectById(projectReq, callback) {
+    dbConnection.connectDB(
+        `select * from project
+        where id = ?`,
+    [projectReq.id],
+    function(error, rows, fields) {
+        var project = new projectModel();
+        if(!!error) {
+            console.error("createProject: " + error);
+            project.isSuccess = false;
+            project.errorMessage = error.code;
+            callback(project);
+        } else {
+            if(rows) {
+                callback(rows);
+            } else {
+                console.error("updateProject: Cannot Update project");
+                project.isSuccess = false;
+                project.errorMessage = 'Cannot Update project';
+                callback(project);
+            }
+        }
+    });
+}
+
 module.exports.getAllProjects = getAllProjects;
 module.exports.createProject = createProject;
 module.exports.updateProject = updateProject;
+module.exports.getProjectById = getProjectById;
