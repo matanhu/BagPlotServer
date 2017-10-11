@@ -55,7 +55,7 @@ app.post('/createProject', function(req,res) {
 
 app.put('/updateProject', function(req,res) {
     var project = req.body;
-    projectsFactory.createProject(project, function(project) {
+    projectsFactory.updateProject(project, function(project) {
         res.send(project);
     });
 });
