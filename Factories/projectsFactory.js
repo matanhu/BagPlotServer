@@ -65,17 +65,17 @@ function updateProject(projectReq, callback) {
             project.errorMessage = error.code;
             callback(project);
         } else {
-            if(rows && rows.insertId) {
-                project.id = rows.insertId;
+            if(rows && rows.changedRows) {
+                project.id = projectReq.id;
                 project.project_name = projectReq.project_name;
                 project.description = projectReq.description;
                 project.image = projectReq.image;
                 project.isSuccess = true;
                 callback(project);
             } else {
-                console.error("createProject: Cannot insert new project");
+                console.error("updateProject: Cannot Update project");
                 project.isSuccess = false;
-                project.errorMessage = 'Cannot insert new project';
+                project.errorMessage = 'Cannot Update project';
                 callback(project);
             }
         }
