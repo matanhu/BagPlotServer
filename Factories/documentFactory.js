@@ -4,6 +4,7 @@ var request = require('request');
 var projectsFactory = require('./projectsFactory');
 var customersFactory = require('./customersFactory');
 var contactFactory = require('./contactFactory');
+var emailFactory = require('./emailFactory');
 
 function createDocx(projectReq, callback) {
     var projectRes = null;
@@ -15,13 +16,15 @@ function createDocx(projectReq, callback) {
             customerRes = dbCustomerRes.customers;
             contactFactory.getContacsByProjectId(projectRes[0].customer_id, function(dbContactRes) {
                 contactsRes = dbContactRes;
-                generateDocxFile(projectRes, customerRes, contactsRes);
+                generateDocxFile(projectRes, customerRes, contactsRes, function(docx) {
+                    callback(docx);
+                });
             });
         });
     });
 }
 
-function generateDocxFile(projectRes, customerRes, contactsRes) {
+function generateDocxFile(projectRes, customerRes, contactsRes, callback) {
     var docx = officegen ({
         'type': 'docx', // or 'xlsx', etc
         'onend': function ( written ) {
@@ -35,15 +38,11 @@ function generateDocxFile(projectRes, customerRes, contactsRes) {
     });
 
     addProjectToDocs(projectRes, docx, function(docxWithProject) {
-        docx = addContactToDocx(contactsRes, docxWithProject, function(docxWithContacts) {
+        addContactToDocx(contactsRes, docx, function(docxWithContacts) {
             var out = fs.createWriteStream ( 'out.docx' );
-            docxWithContacts.generate ( out, {
-              'finalize': function ( written ) {
-                console.log ( 'Finish to create a PowerPoint file.\nTotal bytes created: ' + written + '\n' );
-              },
-              'error': function ( err ) {
-                console.log ( err );
-              }
+            docx.generate ( out);
+            out.on ( 'close', function () {
+                sendEmail();
             });
         });
     });
@@ -68,7 +67,7 @@ function addProjectToDocs(project, docx, callback) {
         pObjDes.addLineBreak ();
         callback(docx);
       });
-
+    //   callback(docx);
     //   return docx;
 }
 
@@ -109,5 +108,10 @@ var download = function(uri, filename, callback){
     });
 };
   
+
+function sendEmail() {
+    var email = new emailFactory('out.docx');
+    email.send();
+}
 
 module.exports.createDocx = createDocx;

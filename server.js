@@ -70,9 +70,10 @@ app.post('/createContact', function(req, res) {
 
 app.post('/createDocx', function(req, res) {
     var project = req.body;
-    documentFactory.createDocx(project, function(docFile) {
-        console.log(docFile);
+    documentFactory.createDocx(project, function(docx) {
+        console.log(docx);
+        // docx.generate(res);
     });
 });
-
+console.log(port);
 app.listen(port);
