@@ -23,6 +23,17 @@ connection.on('error', function(err) {
     }
 });
 
+function handleDisconnect() {
+    connection = mysql.createConnection(db_config); // Recreate the connection, since
+                                                    // the old one cannot be reused.
+
+    connection.connect(function(err) {              // The server is either down
+        if(err) {                                     // or restarting (takes a while sometimes).
+        console.log('error when connecting to db:', err);
+        setTimeout(handleDisconnect, 2000); // We introduce a delay before attempting to reconnect,
+        }                                     // to avoid a hot loop, and to allow our node script to
+});
+
 function connectDB(query, values, callback) {
     try {
         connection.query(query,values, function(error, rows, fields) {
