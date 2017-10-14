@@ -4,6 +4,7 @@ function Project() {
     this.description = '';
     this.date_created = new Date();
     this.customer_id = 0;
+    this.itemsProject = null;
 }
 
 Project.prototype.isSuccess = false;

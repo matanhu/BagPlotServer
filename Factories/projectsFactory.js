@@ -1,5 +1,6 @@
 var dbConnection = require('../dbConnection/dbConnection');
 var projectModel = require('../models/project');
+var projectItemFactory = require('./projectItemFactory');
 
 
 function getAllProjects(callback) {
@@ -84,7 +85,7 @@ function updateProject(projectReq, callback) {
 
 function getProjectById(projectReq, callback) {
     dbConnection.connectDB(
-        `select * from project
+        `select * from Project
         where id = ?`,
     [projectReq.id],
     function(error, rows, fields) {
@@ -107,7 +108,38 @@ function getProjectById(projectReq, callback) {
     });
 }
 
+function getProjectByIdClient(projectReq, callback) {
+    dbConnection.connectDB(
+        `select * from Project
+        where id = ?`,
+    [projectReq],
+    function(error, rows, fields) {
+        var project = new projectModel();
+        if(!!error) {
+            console.error("createProject: " + error);
+            project.isSuccess = false;
+            project.errorMessage = error.code;
+            callback(project);
+        } else {
+            if(rows) {
+                projectItemFactory.getProjectItemsByProjectId(projectReq, function(projectItemsRes) {
+                    project = rows[0];
+                    project.itemsProject = projectItemsRes;
+                    project.isSuccess = true;
+                    callback(project);
+                });      
+            } else {
+                console.error("updateProject: Cannot Update project");
+                project.isSuccess = false;
+                project.errorMessage = 'Cannot Update project';
+                callback(project);
+            }
+        }
+    });
+}
+
 module.exports.getAllProjects = getAllProjects;
 module.exports.createProject = createProject;
 module.exports.updateProject = updateProject;
 module.exports.getProjectById = getProjectById;
+module.exports.getProjectByIdClient = getProjectByIdClient;

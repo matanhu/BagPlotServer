@@ -16,8 +16,8 @@ function createDocx(projectReq, callback) {
             customerRes = dbCustomerRes.customers;
             contactFactory.getContacsByProjectId(projectRes[0].customer_id, function(dbContactRes) {
                 contactsRes = dbContactRes;
-                generateDocxFile(projectRes, customerRes, contactsRes, function(docx) {
-                    callback(docx);
+                generateDocxFile(projectRes, customerRes, contactsRes, function(filename) {
+                    callback(filename);
                 });
             });
         });
@@ -42,7 +42,12 @@ function generateDocxFile(projectRes, customerRes, contactsRes, callback) {
             var out = fs.createWriteStream ( 'out.docx' );
             docx.generate ( out);
             out.on ( 'close', function () {
-                sendEmail();
+                // sendEmail();
+                var res = {
+                    tempFile: 'out.docx',
+                    fileName: projectRes[0].project_name
+                }
+                callback(res);
             });
         });
     });
@@ -54,11 +59,6 @@ function addProjectToDocs(project, docx, callback) {
     pObjName.options.align = 'center'; // Also 'right' or 'jestify'
     pObjName.addText ( project[0].project_name, { bold: true, underline: true } );
     
-    var pObjDes = docx.createP ();
-    pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
-    pObjDes.addText ( project[0].description );
-    pObjDes.addLineBreak ();
-
     var pObjImage = docx.createP();
     // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
     download(project[0].image, 'google.png', function(){
@@ -67,6 +67,11 @@ function addProjectToDocs(project, docx, callback) {
         pObjDes.addLineBreak ();
         callback(docx);
       });
+
+      var pObjDes = docx.createP ();
+      pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
+      pObjDes.addText ( project[0].description );
+      pObjDes.addLineBreak ();
     //   callback(docx);
     //   return docx;
 }
@@ -101,8 +106,8 @@ function addContactToDocx(contactsList, docx, callback) {
 
 var download = function(uri, filename, callback){
     request.head(uri, function(err, res, body){
-        console.log('content-type:', res.headers['content-type']);
-        console.log('content-length:', res.headers['content-length']);
+        // console.log('content-type:', res.headers['content-type']);
+        // console.log('content-length:', res.headers['content-length']);
 
         request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
     });
