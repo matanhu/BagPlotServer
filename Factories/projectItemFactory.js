@@ -48,10 +48,35 @@ function getProjectItemsByProjectId(projectId, callback) {
             if(rows) {
                 callback(rows);
             } else {
-                console.error("updateProject: Cannot Update project");
+                console.error("getProjectItemsByProjectId: Cannot get getProjectItemsByProjectId");
                 projectItems.isSuccess = false;
-                projectItems.errorMessage = 'Cannot Update project';
+                projectItems.errorMessage = 'Cannot get getProjectItemsByProjectId';
                 callback(projectItems);
+            }
+        }
+    });
+}
+
+function getProjectItemById(projectItemId, callback) {
+    dbConnection.connectDB(
+        `select * from Project_item
+        where id = ?`,
+    [projectItemId],
+    function(error, rows, fields) {
+        var projectItem = new projectItemModel();
+        if(!!error) {
+            console.error("createProject: " + error);
+            projectItem.isSuccess = false;
+            projectItem.errorMessage = error.code;
+            callback(projectItem);
+        } else {
+            if(rows) {
+                callback(rows[0]);
+            } else {
+                console.error("getProjectItemById: Cannot get getProjectItemById");
+                projectItem.isSuccess = false;
+                projectItem.errorMessage = 'Cannot get getProjectItemById';
+                callback(projectItem);
             }
         }
     });
@@ -59,3 +84,4 @@ function getProjectItemsByProjectId(projectId, callback) {
 
 module.exports.createProjecrItem = createProjecrItem;
 module.exports.getProjectItemsByProjectId = getProjectItemsByProjectId;
+module.exports.getProjectItemById = getProjectItemById;

@@ -96,5 +96,12 @@ app.post('/api/createProjecrItem/', function(req,res) {
         res.send(projectItemRes);
     });
 });
+
+app.get('/api/getProjectItemById/:projectItemId', function(req, res) {
+    var projectItemId = req.param('projectItemId');
+    projectItemFactory.getProjectItemById(projectItemId, function(projectItemRes) {
+        res.send(projectItemRes);
+    });
+});
 console.log(port);
 app.listen(port);
