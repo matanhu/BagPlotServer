@@ -79,18 +79,19 @@ app.post('/api/createContact', function(req, res) {
 // app.post('/createDocx/:projectId', function(req, res) {
 app.post('/api/createDocx/', function(req, res) {
     var project = req.body;
+    var hostUrl = req.get('host');
     console.log('req.get("host"): ' + req.get('host'));
     console.log('req.originalUrl: ' + req.originalUrl );
     // var project = {
     //     id: req.param('projectId')
     // }
-    documentFactory.createDocx(project, function(file) {
+    documentFactory.createDocx(project, hostUrl, function(file) {
         console.log(file);
         // docx.generate(res);
         // res.setHeader('Content-disposition', 'attachment; filename=BagPlot');
         // res.sendfile(file.tempFile);
         res.send({
-            filePath: 'http://10.0.0.1:3000/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile
+            filePath: hostUrl + '/' + file.projectId + '/' + file.tempFile
         });
     });
 });
