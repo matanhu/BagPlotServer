@@ -39,14 +39,18 @@ function generateDocxFile(projectRes, customerRes, contactsRes, callback) {
 
     addProjectToDocs(projectRes, docx, function(docxWithProject) {
         addContactToDocx(contactsRes, docx, function(docxWithContacts) {
-            var out = fs.createWriteStream ( 'out.docx' );
+            createFolder(projectRes[0].id);
+            var out = fs.createWriteStream ( projectRes[0].id + "/" + projectRes[0].project_name + '.docx' );
             docx.generate ( out);
             out.on ( 'close', function () {
                 // sendEmail();
                 var res = {
-                    tempFile: 'out.docx',
+                    projectId: projectRes[0].id,
+                    tempFile: projectRes[0].project_name + '.docx',
                     fileName: projectRes[0].project_name
                 }
+                sendEmailWithLink(res);
+                deleteFile(res);
                 callback(res);
             });
         });
@@ -114,9 +118,38 @@ var download = function(uri, filename, callback){
 };
   
 
+function createFolder(dir) {
+    if (!fs.existsSync(dir.toString())){
+        fs.mkdirSync(dir.toString());
+    }
+}
+
+function dowloadDocx(projectId, fileName, callback) {
+    var res = {
+        projectId: projectId,
+        tempFile: projectId + '/' + fileName
+    };
+
+    callback(res);
+}
+
 function sendEmail() {
-    var email = new emailFactory('out.docx');
-    email.send();
+    var emailerWithAttachment = new emailFactory.emailerWithAttachment('out.docx');
+    emailerWithAttachment.send();
+}
+
+function sendEmailWithLink(file) {
+    var sendEmailWithLink = new emailFactory.sendEmailWithLink(file.fileName, 'http://10.0.0.1:3000/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile);
+    sendEmailWithLink.send();
+}
+
+function deleteFile(file) {
+    setTimeout(function() {
+        fs.unlink(file.projectId + "/" + file.tempFile, function() {
+            console.log('Delete file: ' + file.projectId + "/" + file.tempFile + ' Was Deleted');
+        });
+    }, 60000);
 }
 
 module.exports.createDocx = createDocx;
+module.exports.dowloadDocx = dowloadDocx;

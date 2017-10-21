@@ -3,8 +3,8 @@ var projectItemModel = require('../models/project_item');
 
 function createProjecrItem(projectItem, callback) {
     var date_created = new Date();
-    dbConnection.connectDB('INSERT INTO Project_item (project_item_name, description, image, date_created, project_id) values (?, ?, ?, ?, ?)',
-    [projectItem.name, projectItem.description, projectItem.image, date_created, projectItem.project_id],
+    dbConnection.connectDB('INSERT INTO project_item (project_item_name, description, image, date_created, project_id) values (?, ?, ?, ?, ?)',
+    [projectItem.project_item_name, projectItem.description, projectItem.image, date_created, projectItem.project_id],
     function(error, rows, fields) {
         var project_item = new projectItemModel();
         if(!!error) {
@@ -34,7 +34,7 @@ function createProjecrItem(projectItem, callback) {
 
 function getProjectItemsByProjectId(projectId, callback) {
     dbConnection.connectDB(
-        `select id, project_item_name, date_created from Project_item
+        `select id, project_item_name, date_created from project_item
         where project_id = ?`,
     [projectId],
     function(error, rows, fields) {
@@ -59,7 +59,7 @@ function getProjectItemsByProjectId(projectId, callback) {
 
 function getProjectItemById(projectItemId, callback) {
     dbConnection.connectDB(
-        `select * from Project_item
+        `select * from project_item
         where id = ?`,
     [projectItemId],
     function(error, rows, fields) {
@@ -82,6 +82,35 @@ function getProjectItemById(projectItemId, callback) {
     });
 }
 
+function updateProjectItem(projectItemReq, callback) {
+    dbConnection.connectDB('UPDATE project_item SET project_item_name = ?, description = ?, image = ? WHERE id = ?',
+    [projectItemReq.project_item_name, projectItemReq.description, projectItemReq.image, projectItemReq.id],
+    function(error, rows, fields) {
+        var projectItem = new projectItemModel();
+        if(!!error) {
+            console.error("createProject: " + error);
+            projectItem.isSuccess = false;
+            projectItem.errorMessage = error.code;
+            callback(projectItem);
+        } else {
+            if(rows && rows.changedRows) {
+                projectItem.id = projectItemReq.id;
+                projectItem.project_name = projectItemReq.project_name;
+                projectItem.description = projectItemReq.description;
+                projectItem.image = projectItemReq.image;
+                projectItem.isSuccess = true;
+                callback(projectItem);
+            } else {
+                console.error("updateProject: Cannot Update project");
+                projectItem.isSuccess = false;
+                projectItem.errorMessage = 'Cannot Update project';
+                callback(projectItem);
+            }
+        }
+    });
+}
+
 module.exports.createProjecrItem = createProjecrItem;
 module.exports.getProjectItemsByProjectId = getProjectItemsByProjectId;
 module.exports.getProjectItemById = getProjectItemById;
+module.exports.updateProjectItem = updateProjectItem;

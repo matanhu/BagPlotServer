@@ -2,7 +2,7 @@ var nodemailer = require('nodemailer');
 var fs = require('fs');
 var path = require('path');
 
-function Emailer(etachment) {
+function emailerWithAttachment(etachment) {
     this.smtpTransport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -42,4 +42,32 @@ function Emailer(etachment) {
     }
 }
 
-module.exports = Emailer;
+function sendEmailWithLink(projectName,link) {
+    this.smtpTransport = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'matan.chipopo@gmail.com',
+            pass: '01111987'
+        }
+        });
+    
+        this.mailOptions = {
+            from: 'matan.chipopo@gmail.com',
+            to: 'matanhuja@gmail.com',
+            subject: 'תיק שטח ' + projectName,
+            html: '<div>שלום,</div><div>להורדת קובץ תיק השטח לחץ <a href="'+link+'">כאן</a></div>'
+        };
+    
+        this.send = function() {
+            this.smtpTransport.sendMail(this.mailOptions, function(error, info){
+            if (error) {
+                console.log(error);
+            } else {
+                console.log('Email sent: ' + info.response);
+            }
+            });
+        }
+}
+
+module.exports.emailerWithAttachment = emailerWithAttachment;
+module.exports.sendEmailWithLink = sendEmailWithLink;

@@ -79,14 +79,28 @@ app.post('/api/createContact', function(req, res) {
 // app.post('/createDocx/:projectId', function(req, res) {
 app.post('/api/createDocx/', function(req, res) {
     var project = req.body;
+    console.log('req.get("host"): ' + req.get('host'));
+    console.log('req.originalUrl: ' + req.originalUrl );
     // var project = {
     //     id: req.param('projectId')
     // }
     documentFactory.createDocx(project, function(file) {
         console.log(file);
         // docx.generate(res);
-        res.setHeader('Content-disposition', 'attachment; filename=BagPlot');
-        res.sendfile(file.tempFile);
+        // res.setHeader('Content-disposition', 'attachment; filename=BagPlot');
+        // res.sendfile(file.tempFile);
+        res.send({
+            filePath: 'http://10.0.0.1:3000/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile
+        });
+    });
+});
+
+app.get('/api/dowloadDocx/:projectId/:filename', function(req,res) {
+    var projectId = req.param('projectId');
+    var filename = req.param('filename');
+    documentFactory.dowloadDocx(projectId, filename, function(file) {
+        // res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+        res.download(file.tempFile);
     });
 });
 
@@ -100,6 +114,13 @@ app.post('/api/createProjecrItem/', function(req,res) {
 app.get('/api/getProjectItemById/:projectItemId', function(req, res) {
     var projectItemId = req.param('projectItemId');
     projectItemFactory.getProjectItemById(projectItemId, function(projectItemRes) {
+        res.send(projectItemRes);
+    });
+});
+
+app.put('/api/updateProjectItem/', function(req, res) {
+    var projectItem = req.body;
+    projectItemFactory.updateProjectItem(projectItem, function(projectItemRes) {
         res.send(projectItemRes);
     });
 });
