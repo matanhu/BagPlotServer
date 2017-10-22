@@ -20,7 +20,7 @@ function createDocx(projectReq, hostUrl, callback) {
             contactFactory.getContacsByProjectId(projectRes[0].id, function(dbContactRes) {
                 contactsRes = dbContactRes.contacts;
                 projectItemFactory.getProjectItemsByProjectId(projectRes[0].id, function(dbItemsRes) {
-                    projectItemsRes = dbItemsRes;
+                    projectItemsRes = dbItemsRes.projectItems;
                     generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, hostUrl, function(filename) {
                         callback(filename);
                     });
