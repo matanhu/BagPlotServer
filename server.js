@@ -42,6 +42,12 @@ app.post('/api/createCustomer', function(req,res) {
     });
 });
 
+app.get('/api/getCountOfProjects', function(req, res) {
+    projectsFactory.getCountOfProjects(function(projectCount) {
+        res.send(projectCount);
+    });
+});
+
 app.get('/api/getAllProjects', function(req, res) {
     projectsFactory.getAllProjects(function(projectList) {
         res.send(projectList);

@@ -46,7 +46,11 @@ function getProjectItemsByProjectId(projectId, callback) {
             callback(projectItems);
         } else {
             if(rows) {
-                callback(rows);
+                var res = {
+                    isSuccess: true,
+                    projectItems: rows
+                };
+                callback(res);
             } else {
                 console.error("getProjectItemsByProjectId: Cannot get getProjectItemsByProjectId");
                 projectItems.isSuccess = false;

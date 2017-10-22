@@ -43,17 +43,17 @@ function getContacsByProjectId(projectId, callback) {
     [projectId],
     function(error, rows, fields) {
         if(!!error) {
-            var customer = new customerModel();
-            customer.isSuccess = false;
-            customer.errorMessage = error.code;
+            var contact = new contactModel();
+            contact.isSuccess = false;
+            contact.errorMessage = error.code;
             console.error("getContacsByProjectId: " + error);
-            callback(customer);
+            callback(contact);
         } else {
             var res = {
                 isSuccess: true,
-                customers: rows
+                contacts: rows
             }
-            callback(rows);
+            callback(res);
         }
     }
 );
