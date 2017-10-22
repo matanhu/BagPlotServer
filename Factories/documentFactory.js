@@ -146,23 +146,23 @@ function addContactToDocx(contactsList, docx, callback) {
         pObj.options.align = 'right'; // Also 'right' or 'jestify'
         pObj.addText ( 'שם פרטי:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].firstName );
-        //pObj.addLineBreak ();
+        pObj.addLineBreak ();
         pObj.addText ( 'שם משפחה:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].lastName );
-        //pObj.addLineBreak ();
+        pObj.addLineBreak ();
         pObj.addText ( 'טלפון במשרד:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].phoneOffice );
-        //pObj.addLineBreak ();
+        pObj.addLineBreak ();
         pObj.addText ( 'פקס:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].faxNumber );
-        //pObj.addLineBreak ();
+        pObj.addLineBreak ();
         pObj.addText ( 'סלולאר:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].cellular );
-        //pObj.addLineBreak ();
+        pObj.addLineBreak ();
         pObj.addText ( 'דוא"ל:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].email );
-        //pObj.addLineBreak ();
-        //pObj.addLineBreak ();
+        // pObj.addLineBreak ();
+        // pObj.addLineBreak ();
     }
     // return docx;
     callback(docx);
@@ -199,7 +199,7 @@ function sendEmail() {
 }
 
 function sendEmailWithLink(file, hostUrl) {
-    var sendEmailWithLink = new emailFactory.sendEmailWithLink(file.fileName, hostUrl + '/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile);
+    var sendEmailWithLink = new emailFactory.sendEmailWithLink(file.fileName, 'http://' + hostUrl + '/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile);
     sendEmailWithLink.send();
 }
 
