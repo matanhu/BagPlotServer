@@ -55,7 +55,7 @@ function sendEmailWithLink(projectName,link) {
             from: 'matan.chipopo@gmail.com',
             to: 'matanhuja@gmail.com',
             subject: 'תיק שטח ' + projectName,
-            html: '<div>שלום,</div><div>להורדת קובץ תיק השטח לחץ <a href="'+link+'">כאן</a></div>'
+            html: '<div dir="rtl">שלום,</div><div>להורדת קובץ תיק השטח לחץ <a href="'+link+'">כאן</a></div>'
         };
     
         this.send = function() {
