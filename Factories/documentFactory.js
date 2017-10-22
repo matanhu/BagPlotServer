@@ -204,6 +204,7 @@ function deleteFolderRecursive(path) {
       fs.rmdirSync(path);
     }
   };
+  
 
 module.exports.createDocx = createDocx;
 module.exports.dowloadDocx = dowloadDocx;
