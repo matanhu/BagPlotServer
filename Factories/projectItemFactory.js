@@ -34,7 +34,7 @@ function createProjecrItem(projectItem, callback) {
 
 function getProjectItemsByProjectId(projectId, callback) {
     dbConnection.connectDB(
-        `select id, project_item_name, date_created from project_item
+        `select id, project_item_name, description, image, date_created from project_item
         where project_id = ?`,
     [projectId],
     function(error, rows, fields) {

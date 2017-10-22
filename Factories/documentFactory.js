@@ -1,30 +1,36 @@
 var officegen = require('officegen');
 var fs = require('fs');
+var async = require('async');
 var request = require('request');
 var projectsFactory = require('./projectsFactory');
 var customersFactory = require('./customersFactory');
 var contactFactory = require('./contactFactory');
 var emailFactory = require('./emailFactory');
+var projectItemFactory = require('./projectItemFactory');
 
 function createDocx(projectReq, hostUrl, callback) {
     var projectRes = null;
     var contactsRes = null;
     var customerRes = null;
+    var projectItemsRes = null;
     projectsFactory.getProjectById(projectReq, function(dbProjectRes) {
         projectRes = dbProjectRes;
         customersFactory.getCustomersById(projectRes[0].customer_id, function(dbCustomerRes){
             customerRes = dbCustomerRes.customers;
-            contactFactory.getContacsByProjectId(projectRes[0].customer_id, function(dbContactRes) {
+            contactFactory.getContacsByProjectId(projectRes[0].id, function(dbContactRes) {
                 contactsRes = dbContactRes;
-                generateDocxFile(projectRes, customerRes, contactsRes, hostUrl, function(filename) {
-                    callback(filename);
+                projectItemFactory.getProjectItemsByProjectId(projectRes[0].id, function(dbItemsRes) {
+                    projectItemsRes = dbItemsRes;
+                    generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, hostUrl, function(filename) {
+                        callback(filename);
+                    });
                 });
             });
         });
     });
 }
 
-function generateDocxFile(projectRes, customerRes, contactsRes, hostUrl, callback) {
+function generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, hostUrl, callback) {
     var docx = officegen ({
         'type': 'docx', // or 'xlsx', etc
         'onend': function ( written ) {
@@ -38,20 +44,22 @@ function generateDocxFile(projectRes, customerRes, contactsRes, hostUrl, callbac
     });
 
     addProjectToDocs(projectRes, docx, function(docxWithProject) {
-        addContactToDocx(contactsRes, docx, function(docxWithContacts) {
-            createFolder(projectRes[0].id);
-            var out = fs.createWriteStream ( projectRes[0].id + "/" + projectRes[0].project_name + '.docx' );
-            docx.generate ( out);
-            out.on ( 'close', function () {
-                // sendEmail();
-                var res = {
-                    projectId: projectRes[0].id,
-                    tempFile: projectRes[0].project_name + '.docx',
-                    fileName: projectRes[0].project_name
-                }
-                sendEmailWithLink(res, hostUrl);
-                deleteFile(res);
-                callback(res);
+        addItemsToDocs(projectItemsRes, docx, function(docxWithItems){
+            addContactToDocx(contactsRes, docx, function(docxWithContacts) {
+                createFolder(projectRes[0].id);
+                var out = fs.createWriteStream ( projectRes[0].id + "/" + projectRes[0].project_name + '.docx' );
+                docx.generate ( out);
+                out.on ( 'close', function () {
+                    // sendEmail();
+                    var res = {
+                        projectId: projectRes[0].id,
+                        tempFile: projectRes[0].project_name + '.docx',
+                        fileName: projectRes[0].project_name
+                    }
+                    sendEmailWithLink(res, hostUrl);
+                    deleteFile(res);
+                    callback(res);
+                });
             });
         });
     });
@@ -59,50 +67,102 @@ function generateDocxFile(projectRes, customerRes, contactsRes, hostUrl, callbac
 }
 
 function addProjectToDocs(project, docx, callback) {
-    var pObjName = docx.createP ();
+    var pObjName = docx.createP ({rtl: true});
     pObjName.options.align = 'center'; // Also 'right' or 'jestify'
     pObjName.addText ( project[0].project_name, { bold: true, underline: true } );
     
-    var pObjImage = docx.createP();
+    var pObjImage = docx.createP({rtl: true});
+    pObjImage.options.align = 'center';
     // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
     download(project[0].image, 'google.png', function(){
         console.log('done');
         pObjImage.addImage ( fs.readFileSync('google.png') );
-        pObjDes.addLineBreak ();
+        //pObjDes.addLineBreak ();
         callback(docx);
       });
 
-      var pObjDes = docx.createP ();
+      var pObjDes = docx.createP ({rtl: true});
       pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
       pObjDes.addText ( project[0].description );
-      pObjDes.addLineBreak ();
+      //pObjDes.addLineBreak ();
     //   callback(docx);
     //   return docx;
 }
 
+function addItemsToDocs(items, docx, callback) {
+    async.forEachOf(items, function (item, index, next){ 
+        
+        // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
+        download(item.image, 'tmp.png', function(){
+            var pObjName = docx.createP ({rtl: true});
+            pObjName.options.align = 'right'; // Also 'right' or 'jestify'
+            pObjName.addText ( item.project_item_name, { bold: true, underline: true } );
+            var pObjImage = docx.createP({rtl: true});
+            pObjImage.options.align = 'center';
+            console.log('done');
+            pObjImage.addImage ( fs.readFileSync('tmp.png') );
+            //pObjImage.addLineBreak ();
+            var pObjDes = docx.createP ({rtl: true});
+            pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
+            pObjDes.addText ( item.description );
+            //pObjDes.addLineBreak ();
+
+            next();
+          });
+    
+        //   callback(docx);
+        //   return docx;
+      }, function(err) {
+        callback(docx);
+        console.log('iterating done');
+      }); 
+
+
+    // for(var i = 0 ; i < items.length ; i++) {
+    //     var pObjName = docx.createP ({rtl: true});
+    //     pObjName.options.align = 'right'; // Also 'right' or 'jestify'
+    //     pObjName.addText ( items[i].project_item_name, { bold: true, underline: true } );
+        
+    //     var pObjImage = docx.createP({rtl: true});
+    //     // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
+    //     download(items[i].image, 'tmp.png', function(){
+    //         console.log('done');
+    //         pObjImage.addImage ( fs.readFileSync('tmp.png') );
+    ////         pObjDes.addLineBreak ();
+    //       });
+    
+    //       var pObjDes = docx.createP ({rtl: true});
+    //       pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
+    //       pObjDes.addText ( items[i].description );
+    ////       pObjDes.addLineBreak ();
+    //     //   callback(docx);
+    //     //   return docx;
+    // }
+}
+
 function addContactToDocx(contactsList, docx, callback) {
     for(var i = 0 ; i < contactsList.length ; i++) {
-        var pObj = docx.createP ();
+        var pObj = docx.createP ({rtl: true});
         pObj.options.align = 'right'; // Also 'right' or 'jestify'
         pObj.addText ( 'שם פרטי:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].firstName );
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
         pObj.addText ( 'שם משפחה:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].lastName );
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
         pObj.addText ( 'טלפון במשרד:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].phoneOffice );
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
         pObj.addText ( 'פקס:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].faxNumber );
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
         pObj.addText ( 'סלולאר:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].cellular );
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
         pObj.addText ( 'דוא"ל:', { bold: true, underline: true } );
         pObj.addText ( contactsList[i].email );
-        pObj.addLineBreak ();
-        pObj.addLineBreak ();
+        //pObj.addLineBreak ();
+        //pObj.addLineBreak ();
     }
     // return docx;
     callback(docx);
@@ -148,7 +208,7 @@ function deleteFile(file) {
         fs.unlink(file.projectId + "/" + file.tempFile, function() {
             console.log('Delete file: ' + file.projectId + "/" + file.tempFile + ' Was Deleted');
         });
-    }, 60000);
+    }, 600000);
 }
 
 module.exports.createDocx = createDocx;
