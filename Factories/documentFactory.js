@@ -74,9 +74,9 @@ function addProjectToDocs(project, docx, callback) {
     var pObjImage = docx.createP({rtl: true});
     pObjImage.options.align = 'center';
     // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
-    download(project[0].image, 'google.png', function(){
+    download(project[0].image, 'project-' + project[0].id, function(){
         console.log('done');
-        pObjImage.addImage ( fs.readFileSync('google.png') );
+        pObjImage.addImage ( fs.readFileSync('tempFiles/project-' + project[0].id + '.png') );
         //pObjDes.addLineBreak ();
         callback(docx);
       });
@@ -93,19 +93,19 @@ function addItemsToDocs(items, docx, callback) {
     async.forEachOf(items, function (item, index, next){ 
         
         // pObjImage.addImage ( path.resolve(__dirname, 'myFile.png' ) );
-        download(item.image, 'tmp.png', function(){
+        download(item.image, 'item-' + item.id, function(){
             var pObjName = docx.createP ({rtl: true});
             pObjName.options.align = 'right'; // Also 'right' or 'jestify'
             pObjName.addText ( item.project_item_name, { bold: true, underline: true } );
             var pObjImage = docx.createP({rtl: true});
             pObjImage.options.align = 'center';
             console.log('done');
-            pObjImage.addImage ( fs.readFileSync('tmp.png') );
+            pObjImage.addImage ( fs.readFileSync('tempFiles/item-' + item.id + '.png') );
             //pObjImage.addLineBreak ();
             var pObjDes = docx.createP ({rtl: true});
             pObjDes.options.align = 'right'; // Also 'right' or 'jestify'
             pObjDes.addText ( item.description );
-            //pObjDes.addLineBreak ();
+            pObjDes.addLineBreak ();
 
             next();
           });
@@ -147,11 +147,12 @@ function addContactToDocx(contactsList, docx, callback) {
 }
 
 var download = function(uri, filename, callback){
+    createFolder('tempFiles');
     request.head(uri, function(err, res, body){
         // console.log('content-type:', res.headers['content-type']);
         // console.log('content-length:', res.headers['content-length']);
 
-        request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+        request(uri).pipe(fs.createWriteStream('tempFiles/' + filename + '.png')).on('close', callback);
     });
 };
   
@@ -186,8 +187,23 @@ function deleteFile(file) {
         fs.unlink(file.projectId + "/" + file.tempFile, function() {
             console.log('Delete file: ' + file.projectId + "/" + file.tempFile + ' Was Deleted');
         });
-    }, 600000);
+        deleteFolderRecursive('./tempFiles');
+    }, 3600000);
 }
+
+function deleteFolderRecursive(path) {
+    if (fs.existsSync(path)) {
+      fs.readdirSync(path).forEach(function(file, index){
+        var curPath = path + "/" + file;
+        if (fs.lstatSync(curPath).isDirectory()) { // recurse
+          deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  };
 
 module.exports.createDocx = createDocx;
 module.exports.dowloadDocx = dowloadDocx;
