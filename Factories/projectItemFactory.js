@@ -75,7 +75,9 @@ function getProjectItemById(projectItemId, callback) {
             callback(projectItem);
         } else {
             if(rows) {
-                callback(rows[0]);
+                projectItem = rows[0];
+                projectItem.isSuccess = true;
+                callback(projectItem);
             } else {
                 console.error("getProjectItemById: Cannot get getProjectItemById");
                 projectItem.isSuccess = false;
