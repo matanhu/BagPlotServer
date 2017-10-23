@@ -84,14 +84,15 @@ app.post('/api/createContact', function(req, res) {
 
 // app.post('/createDocx/:projectId', function(req, res) {
 app.post('/api/createDocx/', function(req, res) {
-    var project = req.body;
+    var project = req.body.project;
+    var emailTo = req.body.emailTo;
     var hostUrl = req.get('host');
     console.log('req.get("host"): ' + req.get('host'));
     console.log('req.originalUrl: ' + req.originalUrl );
     // var project = {
     //     id: req.param('projectId')
     // }
-    documentFactory.createDocx(project, hostUrl, function(file) {
+    documentFactory.createDocx(project, emailTo, hostUrl, function(file) {
         console.log(file);
         // docx.generate(res);
         // res.setHeader('Content-disposition', 'attachment; filename=BagPlot');

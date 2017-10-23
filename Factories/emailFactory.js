@@ -42,7 +42,7 @@ function emailerWithAttachment(etachment) {
     }
 }
 
-function sendEmailWithLink(projectName,link) {
+function sendEmailWithLink(projectName, link, emailTo) {
     this.smtpTransport = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -53,7 +53,7 @@ function sendEmailWithLink(projectName,link) {
     
         this.mailOptions = {
             from: 'matan.chipopo@gmail.com',
-            to: 'matanhuja@gmail.com',
+            to: emailTo,
             subject: 'תיק שטח ' + projectName,
             html: '<div dir="rtl"><div>שלום,</div><div>להורדת קובץ תיק השטח לחץ <a href="'+link+'">כאן</a></div></div>'
         };

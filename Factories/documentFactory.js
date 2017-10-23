@@ -8,7 +8,7 @@ var contactFactory = require('./contactFactory');
 var emailFactory = require('./emailFactory');
 var projectItemFactory = require('./projectItemFactory');
 
-function createDocx(projectReq, hostUrl, callback) {
+function createDocx(projectReq, emailTo, hostUrl, callback) {
     var projectRes = null;
     var contactsRes = null;
     var customerRes = null;
@@ -21,7 +21,7 @@ function createDocx(projectReq, hostUrl, callback) {
                 contactsRes = dbContactRes.contacts;
                 projectItemFactory.getProjectItemsByProjectId(projectRes[0].id, function(dbItemsRes) {
                     projectItemsRes = dbItemsRes.projectItems;
-                    generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, hostUrl, function(filename) {
+                    generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, emailTo, hostUrl, function(filename) {
                         callback(filename);
                     });
                 });
@@ -30,7 +30,7 @@ function createDocx(projectReq, hostUrl, callback) {
     });
 }
 
-function generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, hostUrl, callback) {
+function generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes, emailTo, hostUrl, callback) {
     var docx = officegen ({
         'type': 'docx', // or 'xlsx', etc
         'onend': function ( written ) {
@@ -56,7 +56,7 @@ function generateDocxFile(projectRes, customerRes, projectItemsRes, contactsRes,
                         tempFile: projectRes[0].project_name + '.docx',
                         fileName: projectRes[0].project_name
                     }
-                    sendEmailWithLink(res, hostUrl);
+                    sendEmailWithLink(res, emailTo, hostUrl);
                     deleteFile(res);
                     callback(res);
                 });
@@ -177,8 +177,8 @@ function sendEmail() {
     emailerWithAttachment.send();
 }
 
-function sendEmailWithLink(file, hostUrl) {
-    var sendEmailWithLink = new emailFactory.sendEmailWithLink(file.fileName, 'http://' + hostUrl + '/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile);
+function sendEmailWithLink(file, emailTo, hostUrl) {
+    var sendEmailWithLink = new emailFactory.sendEmailWithLink(file.fileName, 'http://' + hostUrl + '/api/dowloadDocx/'+ file.projectId + '/' + file.tempFile, emailTo);
     sendEmailWithLink.send();
 }
 
