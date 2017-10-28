@@ -54,9 +54,26 @@ app.get('/api/getAllProjects', function(req, res) {
     });
 });
 
+app.get('/api/searchProject/:searchText?', function(req, res) {
+    var searchText = '';
+    if(req.param('searchText')) {
+        searchText = req.param('searchText');
+    }
+    projectsFactory.searchProject(searchText, function(projectList) {
+        res.send(projectList);
+    });
+})
+
 app.get('/api/getProjectByIdClient/:id', function(req, res) {
     var projectId = req.param('id');
     projectsFactory.getProjectByIdClient(projectId, function(projectRes) {
+        res.send(projectRes);
+    });
+});
+
+app.delete('/api/deleteProjectById/:id', function(req, res) {
+    var projectId = req.param('id');
+    projectsFactory.deleteProjectById(projectId, function(projectRes) {
         res.send(projectRes);
     });
 });

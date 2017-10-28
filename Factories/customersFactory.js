@@ -69,9 +69,10 @@ function getCustomersById(id, callback) {
 }
 
 function createCustomer(name, callback) {
+    var date_created = new Date();
     // dbConnection.connectDB('INSERT INTO BagPlot.Customer (customer_name) values (?)',
-    dbConnection.connectDB('INSERT INTO Customer (customer_name) values (?)',
-    [name],
+    dbConnection.connectDB('INSERT INTO Customer (customer_name, date_created) values (?, ?)',
+    [name, date_created],
     function(error, rows, fields) {
         var customer = new customerModel();
         if(!!error) {

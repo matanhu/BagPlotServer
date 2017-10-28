@@ -31,8 +31,40 @@ function getCountOfProjects(callback) {
 
 function getAllProjects(callback) {
     // dbConnection.connectDB('SELECT * FROM BagPlot.Project;', 
-    dbConnection.connectDB('SELECT * FROM Project;',
+    dbConnection.connectDB(`select customer_name, project_name, description, image, proj.date_created, proj.id from
+                            (SELECT * FROM project) as proj
+                            join 
+                            (SELECT * FROM customer) as cust
+                            on proj.customer_id like cust.id
+                            order by proj.date_created desc;`,
         null,
+        function (error, rows, fields) {
+            if (!!error) {
+                var project = new projectModel();
+                project.isSuccess = false;
+                project.errorMessage = error.code;
+                console.error("getAllProjects: " + error);
+                callback(project);
+            } else {
+                var res = {
+                    isSuccess: true,
+                    projects: rows
+                }
+                callback(res);
+            }
+        }
+    );
+
+}
+
+function searchProject(searchText, callback) {
+    // dbConnection.connectDB('SELECT * FROM BagPlot.Project;', 
+    dbConnection.connectDB(`select * from
+    (select customer_name, project_name, description, image, project.date_created, project.id from customer  join project
+    on customer.id = project.customer_id) as cust_proj
+    where cust_proj.project_name like ? or customer_name like ?
+    order by date_created desc;`,
+        ["%"+searchText+"%", "%"+searchText+"%"],
         function (error, rows, fields) {
             if (!!error) {
                 var project = new projectModel();
@@ -105,6 +137,28 @@ function updateProject(projectReq, callback) {
                     project.errorMessage = 'Cannot Update project';
                     callback(project);
                 }
+            }
+        });
+}
+
+function deleteProjectById(projectId, callback) {
+    dbConnection.connectDB(
+        `delete from Project
+        where id = ?`,
+        [projectId],
+        function (error, rows, fields) {
+            var project = new projectModel();
+            if (!!error) {
+                console.error("createProject: " + error);
+                project.isSuccess = false;
+                project.errorMessage = error.code;
+                callback(project);
+            } else {
+                var res = {
+                    isSuccess: true,
+                    project: rows
+                }
+                callback(res);
             }
         });
 }
@@ -187,3 +241,5 @@ module.exports.updateProject = updateProject;
 module.exports.getProjectById = getProjectById;
 module.exports.getProjectByIdClient = getProjectByIdClient;
 module.exports.getCountOfProjects = getCountOfProjects;
+module.exports.searchProject = searchProject;
+module.exports.deleteProjectById = deleteProjectById;

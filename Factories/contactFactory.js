@@ -55,9 +55,10 @@ function getContacsByProjectId(projectId, callback) {
             }
             callback(res);
         }
-    }
-);
+    });
 }
+ 
 
 module.exports.createContact = createContact;
 module.exports.getContacsByProjectId = getContacsByProjectId;
+
