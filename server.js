@@ -115,7 +115,8 @@ app.post('/api/createDocx/', function(req, res) {
         // res.setHeader('Content-disposition', 'attachment; filename=BagPlot');
         // res.sendfile(file.tempFile);
         res.send({
-            filePath: 'http://' + hostUrl + '/api/dowloadDocx/' + file.projectId + '/' + file.tempFile
+            filePath: 'http://' + hostUrl + '/api/dowloadDocx/' + file.projectId + '/' + file.tempFile,
+            isSuccess: file.isSuccess
         });
     });
 });
