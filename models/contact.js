@@ -2,6 +2,7 @@ function Contact() {
         this.id = 0;
         this.firstName = '';
         this.lastName = '';
+        this.position = '';
         this.phoneOffice = '';
         this.faxNumber = '';
         this.cellular = '';

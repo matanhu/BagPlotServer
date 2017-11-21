@@ -19,6 +19,8 @@ var projectsFactory = require('./Factories/projectsFactory');
 var contactFactory = require('./Factories/contactFactory');
 var documentFactory = require('./Factories/documentFactory');
 var projectItemFactory = require('./Factories/projectItemFactory');
+var firebaseFactory = require('./Factories/firebaseFactory');
+var userFactory = require('./Factories/userFactory');
 
 var port=Number(process.env.PORT || 3000);
 
@@ -149,6 +151,41 @@ app.put('/api/updateProjectItem/', function(req, res) {
     projectItemFactory.updateProjectItem(projectItem, function(projectItemRes) {
         res.send(projectItemRes);
     });
+});
+
+app.post('/api/signup', function(req, res) {
+    var signupModel = req.body;
+    firebaseFactory.createUserByEmail(signupModel)
+        .then(function(userRecord) {
+            // See the UserRecord reference doc for the contents of userRecord.
+            console.log("Successfully created new user:", userRecord.uid);
+            signupModel.uid = userRecord.uid;
+            firebaseFactory.updateProfile(signupModel).then(function() {
+                userFactory.createUser(signupModel, function(userRes) {
+                    res.send(userRes);
+                })
+            })
+            .catch(function(error) {
+                console.log("Error firebaseFactory updateProfile user:", error);    
+            });
+        })
+        .catch(function(error) {
+            console.log("Error creating new user:", error);
+        });
+});
+
+app.post('/api/signin', function(req, res) {
+    var signinModel = req.body;
+    firebaseFactory.signinUserByEmail(signinModel)
+        .then(function(userRecord) {
+            // See the UserRecord reference doc for the contents of userRecord.
+            console.log("Successfully signin user:", userRecord.uid);
+            signinModel.uid = userRecord.uid;
+            res.send(userRecord);
+        })
+        .catch(function(error) {
+            console.log("Error signin user:", error);
+        });
 });
 console.log(port);
 app.listen(port);

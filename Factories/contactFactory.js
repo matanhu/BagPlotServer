@@ -5,13 +5,13 @@ function createContact(contactReq, callback) {
     var date_created = new Date();
     // dbConnection.connectDB(`INSERT INTO BagPlot.Contact 
     dbConnection.connectDB(`INSERT INTO Contact 
-    (firstName, lastName, phoneOffice, faxNumber, cellular, email, date_created, project_id) 
-    values (?, ?, ?, ?, ?, ?, ?, ?)`,
-    [contactReq.firstName, contactReq.lastName, contactReq.phoneOffice, contactReq.faxNumber, contactReq.cellular, contactReq.email, date_created, contactReq.project_id],
+    (firstName, lastName, position, phoneOffice, faxNumber, cellular, email, date_created, project_id) 
+    values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [contactReq.firstName, contactReq.lastName, contactReq.position, contactReq.phoneOffice, contactReq.faxNumber, contactReq.cellular, contactReq.email, date_created, contactReq.project_id],
     function(error, rows, fields) {
         var contact = new contactModel();
         if(!!error) {
-            console.error("createProject: " + error);
+            console.error("createContact: " + error);
             contact.isSuccess = false;
             contact.errorMessage = error.code;
             callback(contact);
@@ -20,6 +20,7 @@ function createContact(contactReq, callback) {
                 contact.id = rows.insertId;
                 contact.firstName = contactReq.firstName;
                 contact.lastName = contactReq.lastName;
+                contact.position = contactReq.position;
                 contact.phoneOffice = contactReq.phoneOffice;
                 contact.faxNumber = contactReq.faxNumber;
                 contact.cellular = contactReq.cellular;
@@ -29,9 +30,9 @@ function createContact(contactReq, callback) {
                 contact.isSuccess = true;
                 callback(contact);
             } else {
-                console.error("createProject: Cannot insert new project");
+                console.error("createPContact: Cannot insert new Contact");
                 contact.isSuccess = false;
-                contact.errorMessage = 'Cannot insert new project';
+                contact.errorMessage = 'Cannot insert new Contact';
                 callback(contact);
             }
         }
