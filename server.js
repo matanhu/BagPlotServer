@@ -160,7 +160,7 @@ app.post('/api/signup', function (req, res) {
     });
 });
 
-app.post('/api/signin', function (req, res) {
+app.post('/api/verifyUid', function (req, res) {
     var token = req.body;
     firebaseFactory.verifyIdToken(token.token)
         .then(function (decodedToken) {
